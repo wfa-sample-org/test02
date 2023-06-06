@@ -1,0 +1,28 @@
+name: Build & Deploy
+on:
+  push:
+    branches: [staging]
+env:
+  branch_name: $(echo $GITHUB_REF | awk -F / '{print $3}')
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy app
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{secrets.SSH_HOST}} # IP address of the server you wish to ssh into
+          key: ${{secrets.SSH_PK}} # Private or public key of the server
+          username: ${{ secrets.SSH_USER }} # User of the server you want to ssh into
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            if [ ! -d "/home/wfa/github/${{ github.event.repository.name }}" ]; then
+              cd /home/wfa/github
+              eval "$(ssh-agent -s)"
+              ssh-add /home/wfa/.ssh/github_deploy
+              git clone --branch staging git@github.com:${{ github.repository }}.git
+              cd ${{ github.event.repository.name }}
+              cd /home/wfa
+              echo ${{ secrets.SSH_PASSPHRASE }} | sudo -S python3 deploy.py --name=${{ github.event.repository.name }} --github=git@github.com:${{ github.repository }}.git --github_readable=https://github.com/${{ github.repository }} --devs=${{ vars.DEVS }}
+            fi
+            

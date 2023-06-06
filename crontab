@@ -1,0 +1,5 @@
+0,15,30,45 * * * * /workspace/.heroku/php/bin/php /workspace/bin/console mautic:segments:update >/proc/1/fd/1 2>/proc/1/fd/2
+5,20,35,50 * * * * /workspace/.heroku/php/bin/php /workspace/bin/console mautic:campaigns:update >/proc/1/fd/1 2>/proc/1/fd/2
+10,25,40,55 * * * * /workspace/.heroku/php/bin/php /workspace/bin/console mautic:campaigns:trigger >/proc/1/fd/1 2>/proc/1/fd/2
+
+# An empty line is required at the end of this file for a valid cron file.
